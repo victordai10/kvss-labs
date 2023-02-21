@@ -15,6 +15,20 @@ RaftServer::RaftServer(Frame * frame) {
   /* Your code here for server initialization. Note that this function is 
      called in a different OS thread. Be careful about thread safety if 
      you want to initialize variables here. */
+  int currentTerm = 0;
+  int votedFor = null;
+  struct {
+    int termNum; //contains term number of creation of the entry
+    string command; //contains command to execute by the state machine
+  } entry; //define struct for entry 
+
+  entry log[0] = {}; // ???
+  int commitLength = 0;
+  string currentRole = "follower";
+  string currentLeader = null;
+  int votesReceived[0] = {};
+  int sentLength = [];
+  int ackedLength = [];
 
 }
 
@@ -31,15 +45,40 @@ void RaftServer::Setup() {
   SyncRpcExample();
 }
 
+/**
+ * @brief 
+ * Implement this member function
+ * Else, start agreement on cmd in a new log entry, set index and term with the server’s
+ * current index and term, and return true
+ * @param cmd 
+ * @param index 
+ * @param term 
+ * @return true if server is leader 
+ * @return false if the server is not the leader
+ */
 bool RaftServer::Start(shared_ptr<Marshallable> &cmd,
                        uint64_t *index,
                        uint64_t *term) {
   /* Your code here. This function can be called from another OS thread. */
   *index = 0;
   *term = 0;
+  if(getState(this, &term)) {
+    index = &index;
+    term = &term;
+    
+    return true;
+  }
   return false;
 }
 
+/**
+ * @brief Implement this member function
+  Populate is_leader with true if the server thinks it is the leader
+  Populate term with the server’s current term number
+ * 
+ * @param is_leader is true if server thinks it is the leader
+ * @param term is the server's current term number
+ */
 void RaftServer::GetState(bool *is_leader, uint64_t *term) {
   /* Your code here. This function can be called from another OS thread. */
   *is_leader = 0;
